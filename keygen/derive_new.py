@@ -42,3 +42,13 @@ with open(home_dir+config["working_dir"]+config["key_index_file"], "a") as index
         "\n"
     )
     index.close()
+
+file_enc_iv = urandom(32)
+if len(sys.argv) <= 2:
+    with open(home_dir+config["default_archive_dest_dir"]+sys.argv[1]+".enc", "wb") as file:
+        file.write(aes_gcm_encrypt(file_key[:32], file_enc_iv, file_data))
+        file.close()
+else:
+    with open(sys.argv[2]+".enc", "wb") as file:
+        file.write(aes_gcm_encrypt(file_key[:32], file_enc_iv, file_data))
+        file.close()
