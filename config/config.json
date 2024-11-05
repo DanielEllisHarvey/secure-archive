@@ -3,5 +3,7 @@
     "master_key_file": "master",
     "salt_file": "master_nonce",
     "salt_length": 4096,
+    "passwd_salt_length": 64,
+    "password_salt_file": "passwd_salt",
     "default_archive_dest_dir": "~/Documents/archived-items/"
 }
