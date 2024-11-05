@@ -1,0 +1,7 @@
+{
+    "working_dir": "~/.secarch/",
+    "master_key_file": "master",
+    "salt_file": "master_nonce",
+    "salt_length": 4096,
+    "default_archive_dest_dir": "~/Documents/archived-items/"
+}
