@@ -23,7 +23,7 @@ encryption_key = one_pbkdf(passwd, passwd_salt)
 master_key_enc = aes_gcm_encrypt(encryption_key, master_key_iv, master_key)
 salt_enc = aes_gcm_encrypt(encryption_key, salt_iv, salt)
 
-with open(home_dir+config["working_dir"]+config["password_salt_file"], "wb") as pass_salt_file:
+with open(home_dir+config["working_dir"]+config["passwd_salt_file"], "wb") as pass_salt_file:
     pass_salt_file.write(passwd_salt)
     pass_salt_file.close()
 

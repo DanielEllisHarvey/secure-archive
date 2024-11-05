@@ -4,7 +4,7 @@
     "salt_file": "master_salt",
     "salt_length": 4096,
     "passwd_salt_length": 64,
-    "password_salt_file": "passwd_salt",
+    "passwd_salt_file": "passwd_salt",
     "key_index_file": "keys",
     "default_archive_dest_dir": "/Documents/archived-items/"
 }
