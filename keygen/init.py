@@ -2,24 +2,39 @@
 
 #? This file is the setup for the initial key generation
 from os import urandom
-import random
 import hmac
 import hashlib
 import json
+import getpass
+import cryptography.hazmat.primitives
+from cryptography.hazmat.primitives.kdf import pbkdf2
+from cryptography.hazmat.primitives.ciphers import Cipher, modes, base, algorithms
+from primitives_wrapper import one_pbkdf, aes_gcm_encrypt
 
-working_dir = "~/.secarch"
-master_key_file = "master"
+config = json.loads(open(".config/secarch/config.json", "r").read())
 
-keys_per_file = 128
-
+passwd_salt = urandom(config.passwd_salt_length)
 master_key = urandom(32)
-random_bytes = urandom(4096)
+master_key_iv = urandom(32)
+salt_iv = urandom(32)
+salt = urandom(config.salt_length)
 
-with open(working_dir+"/"+master_key_file, "wb") as mkey_file:
-    mkey_file.write(master_key)
+choice = input("This action will overwrite the current keys, would you like to continue? (y/N): ")
+if choice not in "yY": exit()
+
+passwd = getpass.getpass("passwd: ")
+encryption_key = one_pbkdf(passwd, passwd_salt)
+master_key_enc = aes_gcm_encrypt(encryption_key, master_key_iv, master_key)
+salt_enc = aes_gcm_encrypt(encryption_key, salt_iv, salt)
+
+with open(config.working_dir+config.password_salt_file, "wb") as pass_salt_file:
+    pass_salt_file.write(passwd_salt)
+    pass_salt_file.close()
+
+with open(config.working_dir+config.master_key_file, "wb") as mkey_file:
+    mkey_file.write(master_key_enc+master_key_iv)
     mkey_file.close()
 
-with open(working_dir+"/master_nonce", "wb") as nonce:
-    nonce.write(random_bytes)
-    nonce.close()
-
+with open(config.working_dir+config.salt_file, "wb") as salt:
+    salt.write(salt_enc+salt_iv)
+    salt.close()
