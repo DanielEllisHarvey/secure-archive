@@ -6,7 +6,7 @@ import sys
 import time
 from primitives_wrapper import aes_gcm_decrypt, aes_gcm_encrypt, one_pbkdf, hmac_sha512
 from os import urandom, getenv
-from base64 import b64encode
+from base64 import urlsafe_b64encode
 
 home_dir = getenv("HOME")
 config = json.loads(open(home_dir+"/.config/secarch/config.json", "r").read())
@@ -20,7 +20,7 @@ decryption_key = one_pbkdf(passwd, passwd_salt)
 master_key = aes_gcm_decrypt(key=decryption_key, iv=master_key[-32:], ciphertext=master_key[:-32])
 
 file_byte_id = urandom(64)
-file_id = b64encode(file_byte_id).decode()
+file_id = urlsafe_b64encode(file_byte_id).decode()
 file_data = open(sys.argv[1], "rb").read()
 
 file_key_iv = urandom(32)
@@ -35,7 +35,7 @@ with open(home_dir+config["working_dir"]+"index", "a") as index:
         file_name+" "+ # File name
         str(int(time.time()//1))+" "+ # Current time
         hmac_sha512(master_key, file_data+file_byte_id).hexdigest()[:32]+" "+ # File data integrity (256 bit)
-        b64encode(file_key_enc+file_key_iv).decode()+" "+ # Password-encrypted file key
+        urlsafe_b64encode(file_key_enc+file_key_iv).decode()+" "+ # Password-encrypted file key
         file_id+"\n"
     )
     index.close()

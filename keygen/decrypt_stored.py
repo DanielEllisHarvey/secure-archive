@@ -6,7 +6,7 @@ import json
 import getpass
 import datetime
 from primitives_wrapper import one_pbkdf, aes_gcm_decrypt
-from base64 import b64decode
+from base64 import urlsafe_b64decode
 
 def relative_from_timestamp(n: int | str):
     if type(n) == str:
@@ -48,7 +48,7 @@ index = int(input("index: "))
 file_data_enc = open(home_dir+config["default_archive_dest_dir"]+argv[1].replace(" ", "_")+".enc", "rb").read()
 
 # print(file_matches)
-print(b64decode(file_matches[index][3])[:-32], b64decode(file_matches[index][3])[-32:])
-file_key = aes_gcm_decrypt(decryption_key, b64decode(file_matches[index][3])[-32:], b64decode(file_matches[index][3])[:-32])
+print(urlsafe_b64decode(file_matches[index][3])[:-32], urlsafe_b64decode(file_matches[index][3])[-32:])
+file_key = aes_gcm_decrypt(decryption_key, urlsafe_b64decode(file_matches[index][3])[-32:], urlsafe_b64decode(file_matches[index][3])[:-32])
 file_data = aes_gcm_decrypt(file_key[:32], file_data_enc[-32:], file_data_enc[:-32])
 print(file_data.decode())
