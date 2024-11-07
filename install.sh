@@ -10,4 +10,4 @@ mkdir -p ~/usr/share/secarch/
 mv config/config.json ~/.config/secarch/
 mv keygen/* usr/share/secarch/
 
-chmod +r usr/share/secarch/*
+chmod +r /usr/share/secarch/*
