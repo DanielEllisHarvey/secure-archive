@@ -1,4 +1,4 @@
-#!/bin/bash
+ #!/usr/bin/env bash
 
 #? Any custom directory changes will not be reflected in this installer, and directories must be created manually
 # Create directories in user space
