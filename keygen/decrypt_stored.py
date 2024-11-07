@@ -6,7 +6,9 @@ import getpass
 import datetime
 from primitives_wrapper import one_pbkdf, aes_gcm_decrypt
 
-def relative_from_timestamp(n: int):
+def relative_from_timestamp(n: int | str):
+    if type(n) == str:
+        n = int(n)
     time_delta = (datetime.datetime.now() - datetime.datetime.fromtimestamp(n)).total_seconds() // 1
     return (
         str(int(time_delta/(60*60*24))) + " day(s), " +
@@ -27,5 +29,11 @@ decryption_key = one_pbkdf(passwd, passwd_salt)
 master_key = aes_gcm_decrypt(key=decryption_key, iv=master_key[-32:], ciphertext=master_key[:-32])
 
 file_index = open(home_dir+config["working_dir"]+"index", "r").readlines()
-filenames = list(file.split(" ")[0] for index, file in enumerate(file_index))
+filenames = list((
+    str(index), # +": "+
+    file.split(" ")[0]+" ("+
+    file.split(" ")[4][:5] +")",
+    relative_from_timestamp(file.split(" ")[1]))
+    for index, file in enumerate(file_index))
+
 print(filenames)
