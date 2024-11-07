@@ -6,5 +6,5 @@
     "passwd_salt_length": 64,
     "passwd_salt_file": "passwd_salt",
     "key_index_file": "keys",
-    "default_archive_dest_dir": "~/Documents/archived-items/"
+    "default_archive_dest_dir": "/Documents/archived-items/"
 }
