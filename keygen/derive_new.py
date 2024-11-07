@@ -3,6 +3,7 @@
 import json
 import getpass
 import sys
+import time
 from primitives_wrapper import aes_gcm_decrypt, aes_gcm_encrypt, one_pbkdf, hmac_sha512
 from os import urandom, getenv
 from base64 import b64encode
@@ -23,23 +24,19 @@ file_id = b64encode(file_byte_id).decode()
 file_data = open(sys.argv[1], "rb").read()
 
 file_key_iv = urandom(32)
-file_key = hmac_sha512(master_key, bytes(a ^ b for a, b in zip(file_byte_id, salt))).digest()
+file_key_xor = file_byte_id.rjust(config["salt_length"], file_key_iv[-1:])
+file_key = hmac_sha512(master_key, bytes(a ^ b for a, b in zip(salt, file_key_xor))).digest()
 file_key_enc = aes_gcm_encrypt(decryption_key, file_key_iv, file_key)
+
+file_name = sys.argv[1].replace(" ", "_")
 
 with open(home_dir+config["working_dir"]+"index", "a") as index:
     index.write(
-        sys.argv[1]+" "+ # File name
-        hmac_sha512(master_key, bytes(sys.argv[1], "utf-8")+file_byte_id).hexdigest()+" "+ # File name + id integrity
-        hmac_sha512(master_key, file_data+file_byte_id).hexdigest()+" "+ # File data integrity
+        file_name+" "+ # File name
+        str(int(time.time()//1))+" "+ # Current time
+        hmac_sha512(master_key, file_data+file_byte_id).hexdigest()[:32]+" "+ # File data integrity (256 bit)
+        b64encode(file_key_enc+file_key_iv).decode()+" "+ # Password-encrypted file key
         file_id+"\n"
-    )
-    index.close()
-
-with open(home_dir+config["working_dir"]+config["key_index_file"], "a") as index:
-    index.write(
-        file_id+" "+
-        b64encode(file_key_enc).decode()+" "+ # Password-encrypted file key
-        "\n"
     )
     index.close()
 
