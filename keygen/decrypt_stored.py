@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
 from os import getenv
+from sys import argv
 import json
 import getpass
 import datetime
 from primitives_wrapper import one_pbkdf, aes_gcm_decrypt
+from base64 import b64decode
 
 def relative_from_timestamp(n: int | str):
     if type(n) == str:
@@ -29,11 +31,24 @@ decryption_key = one_pbkdf(passwd, passwd_salt)
 master_key = aes_gcm_decrypt(key=decryption_key, iv=master_key[-32:], ciphertext=master_key[:-32])
 
 file_index = open(home_dir+config["working_dir"]+"index", "r").readlines()
-filenames = list((
-    str(index), # +": "+
-    file.split(" ")[0]+" ("+
-    file.split(" ")[4][:5] +")",
-    relative_from_timestamp(file.split(" ")[1]))
-    for index, file in enumerate(file_index))
 
-print(filenames)
+file_matches = list(file.split(" ") for index, file in enumerate(file_index) if file.split(" ")[0] == argv[1])
+# print(file_matches)
+human_readable_meta = list(
+    list((
+        str(index),
+        file[0]+" ("+
+        file[4][:5] +")",
+        relative_from_timestamp(file[1])
+    )) for index, file in enumerate(file_matches)
+)
+
+print("matches:\n" + str(human_readable_meta).replace("], ", ",\n").replace("[", "").replace("]", ""))
+index = int(input("index: "))
+file_data_enc = open(home_dir+config["default_archive_dest_dir"]+argv[1].replace(" ", "_")+".enc", "rb").read()
+
+# print(file_matches)
+print(b64decode(file_matches[index][3])[:-32], b64decode(file_matches[index][3])[-32:])
+file_key = aes_gcm_decrypt(decryption_key, b64decode(file_matches[index][3])[-32:], b64decode(file_matches[index][3])[:-32])
+file_data = aes_gcm_decrypt(file_key[:32], file_data_enc[-32:], file_data_enc[:-32])
+print(file_data.decode())
