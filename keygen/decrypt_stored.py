@@ -3,8 +3,17 @@
 from os import getenv
 import json
 import getpass
+import datetime
 from primitives_wrapper import one_pbkdf, aes_gcm_decrypt
 
+def relative_from_timestamp(n: int):
+    time_delta = (datetime.datetime.now() - datetime.datetime.fromtimestamp(n)).total_seconds() // 1
+    return (
+        str(int(time_delta/(60*60*24))) + " day(s), " +
+        str(int(time_delta/(60*60))%24) + " hour(s), " +
+        str(int(time_delta/60)%60) + " minute(s), " +
+        str(int(time_delta%60))+ " second(s) ago"
+    )
 
 home_dir = getenv("HOME")
 config = json.loads(open(home_dir+"/.config/secarch/config.json", "r").read())
