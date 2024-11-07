@@ -35,6 +35,6 @@ def one_pbkdf(passwd, salt):
         iterations=1000,
         backend=openssl.backend
     ).derive(bytes(passwd, "utf-8"))
-    
+
 def hmac_sha512(key, data):
     return hmac.new(key, data, hashlib.sha3_512)

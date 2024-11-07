@@ -9,7 +9,7 @@ from primitives_wrapper import one_pbkdf, aes_gcm_decrypt
 from base64 import urlsafe_b64decode
 
 def relative_from_timestamp(n: int | str):
-    if type(n) == str:
+    if isinstance(n, str):
         n = int(n)
     time_delta = (datetime.datetime.now() - datetime.datetime.fromtimestamp(n)).total_seconds() // 1
     return (
