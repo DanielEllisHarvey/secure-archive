@@ -7,7 +7,7 @@ mkdir -p ~/.secarch/
 mkdir -p ~/Documents/archived-items/
 mkdir -p ~/.local/share/secarch
 
-mv config/config.json ~/.config/secarch/
-mv keygen/* ~/.local/share/secarch
+cp config/config.json ~/.config/secarch/
+cp keygen/* ~/.local/share/secarch
 
 chmod +r ~/.local/share/secarch*
